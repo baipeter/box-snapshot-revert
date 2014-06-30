@@ -18,6 +18,9 @@ def get_folder_contents(folderid):
     if '401' in str(r.status_code):
         print 'Error: 401 Unauthorized. Check your access token. Exiting.'
         exit(1)
+    elif r.text == '':
+        print 'Unexpected response from server. Exiting.'
+        exit(1)
 
     response = json.loads(r.text)
     # print json.dumps(response, indent=4)
