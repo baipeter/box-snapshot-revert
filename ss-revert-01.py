@@ -1,7 +1,12 @@
 import requests
 import json
+import os
+from sys import exit
 
-token = ''
+token = os.environ.get('BOX_ACCESS_TOKEN')
+if token == None:
+    print 'No token defined in environment. Exiting.'
+    exit(1)
 
 # Retrieve all items in root folder
 
