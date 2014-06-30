@@ -1,7 +1,7 @@
 import requests
 import json
 
-token = 'KVxHzSblcnWIAVV8O3NperFuU9nhIIDT'
+token = ''
 
 # Retrieve all items in root folder
 
