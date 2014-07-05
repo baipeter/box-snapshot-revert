@@ -15,6 +15,7 @@ def get_folder_contents(folderid):
     r = requests.get(url, headers = headers)
     
     #check for errors
+
     if '401' in str(r.status_code):
         print 'Error: 401 Unauthorized. Check your access token. Exiting.'
         exit(1)
@@ -26,6 +27,29 @@ def get_folder_contents(folderid):
     # print json.dumps(response, indent=4)
 
     return response
+
+def get_file_info(fileid):
+    pass
+
+def get_file_past_versions(fileid):
+    pass
+
+    url = 'https://api.box.com/2.0/files/' + str(fileid) + '/versions'
+    headers = {
+        'Authorization': 'Bearer ' + token
+    }
+
+    r = requests.get(url, headers = headers)
+
+    if '401' in str(r.status_code):
+        print 'Error: 401 Unauthorized. Check your access token. Exiting.'
+        exit(1)
+    elif r.text == '':
+        print 'Unexpected response from server. Exiting.'
+        exit(1)
+
+    response = json.loads(r.text)
+
 
 def seek_folder(ID, allFolders):
 
@@ -39,6 +63,7 @@ def seek_folder(ID, allFolders):
     allFolders.append(ID)
 
 # Load access token
+
 token = os.environ.get('BOX_ACCESS_TOKEN')
 if token == None:
     print 'No token defined in environment. Exiting.'
@@ -46,7 +71,20 @@ if token == None:
 
 
 # get all folders
-allFolders = []
-seek_folder(0, allFolders)
 
-print allFolders
+# allFolders = []
+# seek_folder(0, allFolders)
+# print allFolders
+
+# pick a folder and explore
+
+firstFolderContents = get_folder_contents(2167061144)
+print json.dumps(firstFolderContents, indent=4)
+
+for entry in firstFolderContents['entries']:
+    if entry['type'] == 'file':
+        print 'file id %s (%s)' % (entry['id'], entry['name'])
+
+        # show version info
+
+
