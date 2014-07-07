@@ -1,8 +1,11 @@
 import requests
 import json
 import os
+from datetime import datetime
 from sys import exit
 
+def request_search_parameters():
+    pass
 
 def get_folder_contents(folderid):
 
@@ -28,8 +31,21 @@ def get_folder_contents(folderid):
 
     return response
 
+def seek_folder(ID, allFolders):
+
+    print 'seeking folder %d' % ID
+    response = get_folder_contents(ID)
+    
+    for element in response['entries']:
+        if element['type'] == 'folder':
+            seek_folder(int(element['id']), allFolders)
+
+    allFolders.append(ID)
+
+
 def get_file_info(fileid):
     pass
+
 
 def get_file_past_versions(fileid):
     pass
@@ -48,19 +64,14 @@ def get_file_past_versions(fileid):
         print 'Unexpected response from server. Exiting.'
         exit(1)
 
-    response = json.loads(r.text)
+    return json.loads(r.text)
 
 
-def seek_folder(ID, allFolders):
+def check_version_info(fileid, searchParameters):
+    pass
 
-    print 'seeking folder %d' % ID
-    response = get_folder_contents(ID)
-    
-    for element in response['entries']:
-        if element['type'] == 'folder':
-            seek_folder(int(element['id']), allFolders)
 
-    allFolders.append(ID)
+
 
 # Load access token
 
@@ -81,10 +92,36 @@ if token == None:
 firstFolderContents = get_folder_contents(2167061144)
 print json.dumps(firstFolderContents, indent=4)
 
-for entry in firstFolderContents['entries']:
-    if entry['type'] == 'file':
-        print 'file id %s (%s)' % (entry['id'], entry['name'])
 
-        # show version info
+# create date objects and define search parameters
+
+
+# 2014-07-04T19:16:41-07:00
+
+date_object = datetime.strptime('2014-07-04T19:16:41-07:00', '%Y-%m-%dT%H:%M:%S-' )
+
+
+searchParameters = ['user', 'date_start', 'date_end']
+
+
+
+# for each item in folder, print its version info if it's a file
+
+for item in firstFolderContents['entries']:
+    if item['type'] == 'file':
+        print 'file id %s (%s)' % (item['id'], item['name'])
+
+        fileVersionInfo =  get_file_past_versions(item['id'])
+        if fileVersionInfo['total_count'] > 0:
+            print json.dumps(fileVersionInfo, indent = 4)
+
+
+
+
+
+
+
+
+
 
 
