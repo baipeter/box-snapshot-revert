@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import dateutil.parser
 from datetime import datetime
 from sys import exit
 
@@ -90,17 +91,12 @@ if token == None:
 # pick a folder and explore
 
 firstFolderContents = get_folder_contents(2167061144)
-print json.dumps(firstFolderContents, indent=4)
 
 
 # create date objects and define search parameters
 
-
-# 2014-07-04T19:16:41-07:00
-
-date_object = datetime.strptime('2014-07-04T19:16:41-07:00', '%Y-%m-%dT%H:%M:%S-' )
-
-
+date_object = dateutil.parser.parse('2014-07-04T19:16:41-07:00')
+print date_object.year
 searchParameters = ['user', 'date_start', 'date_end']
 
 
@@ -115,9 +111,8 @@ for item in firstFolderContents['entries']:
         if fileVersionInfo['total_count'] > 0:
             print json.dumps(fileVersionInfo, indent = 4)
 
-
-
-
+            # get all file versions and store their IDs and modifation dates
+            if fileVersionInfo['']
 
 
 
