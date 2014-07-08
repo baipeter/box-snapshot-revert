@@ -5,8 +5,12 @@ import dateutil.parser
 from datetime import datetime
 from sys import exit
 
-def request_search_parameters():
-    pass
+
+# Initial Settings
+
+targetDateStr = '2014-07-04T19:16:41-07:00'    # Files uploaded to Box after this date will be reverted to a version before this date.
+targetDate = dateutil.parser.parse(targetDateStr)
+
 
 def get_folder_contents(folderid):
 
@@ -45,11 +49,25 @@ def seek_folder(ID, allFolders):
 
 
 def get_file_info(fileid):
-    pass
+    
+    url = 'https://api.box.com/2.0/files/' + str(fileid)
+    headers = {
+        'Authorization': 'Bearer ' + token
+    }
+
+    r = requests.get(url, headers = headers)
+
+    if '401' in str(r.status_code):
+        print 'Error: 401 Unauthorized. Check your access token. Exiting.'
+        exit(1)
+    elif r.text == '':
+        print 'Unexpected response from server. Exiting.'
+        exit(1)
+
+    return json.loads(r.text)
 
 
 def get_file_past_versions(fileid):
-    pass
 
     url = 'https://api.box.com/2.0/files/' + str(fileid) + '/versions'
     headers = {
@@ -68,10 +86,73 @@ def get_file_past_versions(fileid):
     return json.loads(r.text)
 
 
-def check_version_info(fileid, searchParameters):
-    pass
+def check_file_mod_date(fileid):
+
+    modifiedDate = dateutil.parser.parse(get_file_info(fileid)['modified_at'])
+
+    if modifiedDate > targetDate:
+
+        versionInfoArray = []
+
+        pastVersionInfo = get_file_past_versions(fileid)
+        store_modified_info(pastVersionInfo, versionInfoArray)
+
+        if versionInfoArray > 0:
+
+            choose_good_version(fileid, versionInfoArray)
+
+        else:
+
+            print 'No versions exist prior to target date.'
 
 
+
+def store_modified_info(fileVersionInfo, versionInfoArray):
+
+    for version in fileVersionInfo['entries']:
+
+        modifiedAt = dateutil.parser.parse(version['modified_at'])
+        versionInfoArray.append([modifiedAt, version['id']])
+
+
+def promote_version(fileid, versionid):
+
+    url = 'https://api.box.com/2.0/files/' + str(fileid) + '/versions/current'
+    headers = {
+        'Authorization': 'Bearer ' + token
+    }
+
+    data = {"type": "file_version", "id" : str(versionid)}
+    data = json.dumps(data)
+
+    r = requests.post(url, headers = headers, data = data)
+
+    if '401' in str(r.status_code):
+        print 'Error: 401 Unauthorized. Check your access token. Exiting.'
+        exit(1)
+    elif r.text == '':
+        print 'Unexpected response from server. Exiting.'
+        exit(1)
+
+    return json.loads(r.text)
+
+
+
+def choose_good_version(fileid, versionInfoArray):
+
+    print 'choosing good version for fileid', fileid
+
+    for version in versionInfoArray:    # bug: this picks ANY version earlier than target date. We want LATEST version that is earlier than target date.
+
+        if version[0] < targetDate:
+
+            selectedVersion = version[1]
+
+            print 'promoting versionid %s for fileid %s' % (str(selectedVersion), str(fileid))
+
+            promote_version(fileid, selectedVersion)
+
+            break
 
 
 # Load access token
@@ -93,28 +174,26 @@ if token == None:
 firstFolderContents = get_folder_contents(2167061144)
 
 
-# create date objects and define search parameters
-
-date_object = dateutil.parser.parse('2014-07-04T19:16:41-07:00')
-print date_object.year
-searchParameters = ['user', 'date_start', 'date_end']
-
 
 
 # for each item in folder, print its version info if it's a file
+# if the current modified date is beyond the target date, search past versions
 
 for item in firstFolderContents['entries']:
     if item['type'] == 'file':
         print 'file id %s (%s)' % (item['id'], item['name'])
 
-        fileVersionInfo =  get_file_past_versions(item['id'])
-        if fileVersionInfo['total_count'] > 0:
-            print json.dumps(fileVersionInfo, indent = 4)
-
-            # get all file versions and store their IDs and modifation dates
-            if fileVersionInfo['']
+        check_file_mod_date(item['id'])
 
 
+
+        # fileVersionInfo =  get_file_past_versions(item['id'])
+        # if fileVersionInfo['total_count'] > 0:
+
+        #     versionInfoArray = []
+
+        #     store_modified_info(fileVersionInfo, versionInfoArray)
+        #     print versionInfoArray
 
 
 

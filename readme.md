@@ -19,6 +19,13 @@
   - see: [Content Times](http://developers.box.com/content-times/)
 - Box uses ISO 8601 format timestamps
 	- in Python, use `datetime.isoformat([sep])`
+
+## Cases to test
+- positive: file modified after target date
+- negative: file modified before target date
+- negative: file create after target date (new file, not corrupted, no version history)
+- ?: multiple versions after target date
+- negative: file has already been reverted (related to above)
 	
 ## Dependencies
 - dateutil: `pip install python-dateutil`
