@@ -7,7 +7,6 @@ from sys import exit
 
 
 # Initial Settings
-
 targetDateStr = '2014-07-04T19:16:41-07:00'    # Files uploaded to Box after this date will be reverted to a version before this date.
 targetDate = dateutil.parser.parse(targetDateStr)
 
@@ -156,25 +155,20 @@ def choose_good_version(fileid, versionInfoArray):
 
 
 # Load access token
-
 token = os.environ.get('BOX_ACCESS_TOKEN')
 if token == None:
     print 'No token defined in environment. Exiting.'
     exit(1)
 
 
-# get all folders
-
-# allFolders = []
+# Get all folders
+allFolders = []
 # seek_folder(0, allFolders)
 # print allFolders
 
-# pick a folder and explore
-
-firstFolderContents = get_folder_contents(2167061144)
-
-
-
+# Pick a folder and explore
+myFolderId = 12345678
+firstFolderContents = get_folder_contents(12345678)
 
 # for each item in folder, print its version info if it's a file
 # if the current modified date is beyond the target date, search past versions
@@ -194,8 +188,3 @@ for item in firstFolderContents['entries']:
 
         #     store_modified_info(fileVersionInfo, versionInfoArray)
         #     print versionInfoArray
-
-
-
-
-

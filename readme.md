@@ -1,14 +1,10 @@
-## Features
-### To Add
-- define search parameters
-	- modified by [user]
-	- modified between [date range]
-	- chose Box or local modified time 
-- multi-step process
-	- generate matched search results
-	- take search results and execute revert
-		- allows users opportunity to edit files to modify
-- output logging
+# Box Snapshot Revert
+
+Reverts all files in a folder to the newest version before a given date. Originally built as a POC for recovery from mass data corruption, e.g. via Cryptolocker virus.
+
+## Dependencies
+- dateutil: `pip install python-dateutil`
+
 
 ## Notes
 ### Authentication
@@ -26,6 +22,16 @@
 - negative: file create after target date (new file, not corrupted, no version history)
 - ?: multiple versions after target date
 - negative: file has already been reverted (related to above)
-	
-## Dependencies
-- dateutil: `pip install python-dateutil`
+
+### Features to consider
+- define search parameters
+	- modified by [user]
+	- modified between [date range]
+	- chose Box or local modified time 
+- multi-step process
+	- generate matched search results
+	- take search results and execute revert
+		- allows users opportunity to edit files to modify
+- output logging
+
+
